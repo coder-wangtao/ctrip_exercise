@@ -13,12 +13,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //设置状态栏的颜色
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-    );
+    // SystemChrome.setSystemUIOverlayStyle(
+    //   SystemUiOverlayStyle(
+    //     statusBarColor: Colors.transparent,
+    //     statusBarIconBrightness: Brightness.dark,
+    //   ),
+    // );
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
