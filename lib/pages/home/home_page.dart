@@ -2,6 +2,8 @@ import 'package:ctrip_exercise/model/common_model.dart';
 import 'package:ctrip_exercise/model/home_model.dart';
 import 'package:ctrip_exercise/pages/home/widget/banner_widget.dart';
 import 'package:ctrip_exercise/pages/home/widget/grid_nav_widget.dart';
+import 'package:ctrip_exercise/pages/home/widget/sales_box_widget.dart';
+import 'package:ctrip_exercise/pages/home/widget/sub_nav_widget.dart';
 import 'package:ctrip_exercise/request/home/home_request.dart';
 import 'package:ctrip_exercise/widget/search_bar.dart';
 import 'package:flutter/material.dart';
@@ -25,14 +27,14 @@ class _HomePageState extends State<HomePage> {
   List<CommonModel>? bannerList = [];
   List<CommonModel>? localNavList = [];
   List<CommonModel>? subNavList = [];
-  late GridNavModel? gridNavModel;
-  late SalesBoxModel? salesBoxModel;
+  GridNavModel? gridNavModel;
+  SalesBoxModel? salesBoxModel;
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
+    // TODO: implement initState]
     _handleRefresh();
+    super.initState();
   }
 
   Widget get _appBar {
@@ -114,62 +116,16 @@ class _HomePageState extends State<HomePage> {
                           padding: EdgeInsets.fromLTRB(14, 0, 14, 0),
                           margin: EdgeInsets.only(top: 10),
                           child: Column(
-                            children: [GridNavWidget()],
+                            children: [
+                              GridNavWidget(),
+                              Padding(padding: EdgeInsets.only(top: 10)),
+                              SubNavWidget(
+                                subNavList: subNavList,
+                              ),
+                              Padding(padding: EdgeInsets.only(top: 10)),
+                              SalesBoxWidget(salesBoxModel: salesBoxModel)
+                            ],
                           ),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
-                        ),
-                        ListTile(
-                          title: Text("1"),
                         ),
                       ],
                     ),

@@ -217,7 +217,7 @@ class _SearchInputBarState extends State<SearchInputBar> {
 
   Widget _hintItem(HotKeyword item) {
     return Container(
-        padding: EdgeInsets.fromLTRB(4, 7, 0, 0),
+        padding: EdgeInsets.fromLTRB(4, 0, 0, 0),
         child: Text(
           item.prefix! + "\“" + item.content! + "\”",
           style: TextStyle(fontSize: 14, color: Colors.grey),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'navigator/tab_navigator.dart';
 
@@ -27,6 +26,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         useMaterial3: false,
+        splashFactory: NoSplash.splashFactory, // 全局移除水波纹效果
+        highlightColor: Colors.transparent, // 全局移除点击高亮效果
       ),
       home: TabNavigator(),
     );
