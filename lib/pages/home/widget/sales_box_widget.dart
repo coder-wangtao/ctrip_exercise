@@ -73,7 +73,7 @@ class SalesBoxWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         _item(context, leftCard, big, true),
-        _item(context, leftCard, big, false)
+        _item(context, rightCard, big, false)
       ],
     );
   }
