@@ -7,32 +7,32 @@ class VerticalTabView extends StatefulWidget {
   final List<Widget>? contents;
   final TextDirection direction;
   final bool? disabledChangePageFromContentView;
-  final Axis? contentScrollAxis;
+  final Axis contentScrollAxis;
   final Color? selectedTabBackgroundColor; //选中时左侧tab的背景颜色
   final Color? tabBackgroundColor; //左侧tab的背景颜色
   final TextStyle? selectedTabTextStyle;
   final TextStyle? tabTextStyle;
-  final Duration? changePageDuration;
-  final Curve? changePageCurve;
+  final Duration changePageDuration;
+  final Curve changePageCurve;
   final Color? tabsShadowColor; ////左侧tab的阴影的颜色
   final double? tabsElevation; //左侧tab的阴影
   final Function(int tabIndex)? onSelect;
   final Color? backgroundColor;
   const VerticalTabView(
       {super.key,
-      this.initialIndex,
+      this.initialIndex = 0,
       this.tabsWidth,
       this.tabs,
       this.contents,
       this.direction = TextDirection.ltr,
-      this.disabledChangePageFromContentView,
-      this.contentScrollAxis,
+      this.disabledChangePageFromContentView = false,
+      this.contentScrollAxis = Axis.horizontal,
       this.selectedTabBackgroundColor = const Color(0x1100ff00),
       this.tabBackgroundColor = const Color(0xfff8f8f8),
       this.selectedTabTextStyle,
       this.tabTextStyle,
-      this.changePageDuration,
-      this.changePageCurve,
+      this.changePageDuration = const Duration(microseconds: 300),
+      this.changePageCurve = Curves.easeInOut,
       this.tabsShadowColor,
       this.tabsElevation,
       this.onSelect,
@@ -44,12 +44,34 @@ class VerticalTabView extends StatefulWidget {
 
 class _VerticalTabViewState extends State<VerticalTabView>
     with TickerProviderStateMixin {
-  int _selectedIndex = 0;
-  late bool? _changePageByTapView;
+  late int _selectedIndex;
   late AnimationController animationController;
   List<AnimationController> animationControllers = [];
   ScrollPhysics pageScrollPhysics = AlwaysScrollableScrollPhysics();
   PageController pageController = PageController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _selectedIndex = widget.initialIndex!;
+    for (int i = 0; i < widget.tabs!.length; i++) {
+      animationControllers.add(AnimationController(
+          vsync: this, duration: const Duration(microseconds: 400)));
+    }
+    _selectTab(widget.initialIndex);
+
+    //是否禁用滚动
+    if (widget.disabledChangePageFromContentView == true) {
+      pageScrollPhysics = NeverScrollableScrollPhysics();
+    }
+    super.initState();
+
+    //这段代码的主要目的是在构建页面完成后，立即跳转到指定的初始页面
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      pageController.jumpToPage(widget.initialIndex!);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -113,10 +135,12 @@ class _VerticalTabViewState extends State<VerticalTabView>
 
                           return GestureDetector(
                             onTap: () {
-                              _changePageByTapView = true;
                               setState(() {
                                 _selectTab(index);
                               });
+                              pageController.animateToPage(index,
+                                  duration: widget.changePageDuration,
+                                  curve: widget.changePageCurve);
                             },
                             child: Container(
                               decoration: BoxDecoration(
@@ -133,25 +157,20 @@ class _VerticalTabViewState extends State<VerticalTabView>
               shadowColor: widget.tabsShadowColor,
               shape: const BeveledRectangleBorder(), //矩形边框
             ),
-            // Expanded(
-            //     child: PageView.builder(
-            //         scrollDirection: widget.contentScrollAxis!,
-            //         physics: pageScrollPhysics,
-            //         onPageChanged: (index) {
-            //           if (_changePageByTapView == false ||
-            //               _changePageByTapView == null) {
-            //             _selectTab(index);
-            //           }
-            //           if (_selectedIndex == index) {
-            //             _changePageByTapView = null;
-            //           }
-            //           setState(() {});
-            //         },
-            //         controller: pageController,
-            //         itemCount: widget.contents!.length,
-            //         itemBuilder: (BuildContext context, int index) {
-            //           return widget.contents![index];
-            //         }))
+            Expanded(
+                child: PageView.builder(
+                    scrollDirection: widget.contentScrollAxis,
+                    physics: pageScrollPhysics,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _selectTab(index);
+                      });
+                    },
+                    controller: pageController,
+                    itemCount: widget.contents!.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return widget.contents![index];
+                    }))
           ],
         ),
       ),
@@ -160,12 +179,14 @@ class _VerticalTabViewState extends State<VerticalTabView>
 
   void _selectTab(index) {
     _selectedIndex = index;
-    // for (AnimationController animationController in animationControllers) {
-    //   animationController.reset();
-    // }
-    // animationControllers[index].forward();
+    for (AnimationController animationController in animationControllers) {
+      animationController.reset();
+    }
+    if (animationControllers.length != 0) {
+      animationControllers[index].forward();
+    }
     if (widget.onSelect != null) {
-      widget!.onSelect!(_selectedIndex);
+      widget.onSelect!(_selectedIndex);
     }
   }
 }
