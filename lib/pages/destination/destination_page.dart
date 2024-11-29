@@ -1,4 +1,6 @@
 import 'package:ctrip_exercise/model/destination_model.dart';
+import 'package:ctrip_exercise/pages/destination/destination_search_page.dart';
+import 'package:ctrip_exercise/util/navigator_util.dart';
 import 'package:ctrip_exercise/widget/loading_container.dart';
 import 'package:ctrip_exercise/widget/search_bar.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +71,7 @@ class _DestinationPageState extends State<DestinationPage>
               child: SafeArea(
                 child: SearchInputBar(
                   searchBarType: SearchBarType.homeLight,
-                  inputBoxClick: () {},
+                  inputBoxClick: () => _jumpToSearch(context),
                   defaultText: DEFAULT_TEXT,
                   speakClick: () {},
                   rightButtonClick: () {},
@@ -404,5 +406,14 @@ class _DestinationPageState extends State<DestinationPage>
         ],
       ),
     ));
+  }
+
+  void _jumpToSearch(BuildContext context) {
+    NavigatorUtil.push(
+        context,
+        DestinationSearchPage(
+          hint: DEFAULT_TEXT,
+          hideLeft: false,
+        ));
   }
 }
