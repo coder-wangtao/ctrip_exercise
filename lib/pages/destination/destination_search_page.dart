@@ -26,7 +26,6 @@ class _DestinationSearchPageState extends State<DestinationSearchPage> {
   List<Widget> items = [];
   String? keyword;
   DestinationSearchModel? destinationSearchModel;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,55 +111,166 @@ class _DestinationSearchPageState extends State<DestinationSearchPage> {
 
   List<Widget> _createContent() {
     List<Widget> _contents = [];
+    print(destinationSearchModel?.modules?.length);
     destinationSearchModel?.modules?.forEach((DestinationSearchItem model) {
-      _contents.add(_createPoiInfo(
-          model.title ?? "", 1, model.name ?? "", model.name ?? ""));
+      _contents
+          .add(_createSearchItem(model?.style, model?.items, model?.title));
     });
     return _contents;
   }
 
-  Widget _createPoiInfo(
-      String searchName, int poid, String upperName, String dataType) {
-    String icon = 'images/lvpai_search_list.png';
-    if (dataType == 'D') icon = 'images/lvpai_issue_position.png';
-    if (dataType == '') icon = 'images/lvpai_search_list.png';
-    if (dataType == 'SS') icon = 'images/lvpai_issue_sight.png';
-    return GestureDetector(
-      onTap: () {
-        //todo
-      },
-      child: Container(
-        padding: EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(width: 0.3, color: Colors.grey)),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: EdgeInsets.only(right: 8),
-              child: Image(
-                height: 16,
-                width: 16,
-                image: AssetImage(icon),
+  Widget _createSearchItem(int? type, List<Items>? items, String? title) {
+    if (type == 0) {
+      String icon = 'images/lvpai_search_list.png';
+      return Column(
+        children: items!.map((item) {
+          return GestureDetector(
+            onTap: () {
+              //todo
+            },
+            child: Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                border:
+                    Border(bottom: BorderSide(width: 0.2, color: Colors.grey)),
               ),
-            ),
-            Expanded(
-                child: Container(
-              child: Wrap(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('111'),
-                  Padding(padding: EdgeInsets.only(right: 6)),
-                  Text(
-                    upperName,
-                    style: TextStyle(color: Color(0xff999999)),
-                  )
+                  Container(
+                    margin: EdgeInsets.only(right: 8),
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 3),
+                      child: Image(
+                        height: 16,
+                        width: 16,
+                        image: AssetImage(icon),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                      child: Container(
+                    child: Wrap(
+                      children: [
+                        _title(item?.displayName ?? ""),
+                        Padding(padding: EdgeInsets.only(right: 6)),
+                        Text(
+                          item?.upperName ?? '',
+                          style: TextStyle(color: Color(0xff999999)),
+                        )
+                      ],
+                    ),
+                  ))
                 ],
               ),
-            ))
+            ),
+          );
+        }).toList(),
+      );
+    } else if (type == 1) {
+      String icon = 'images/lvpai_issue_position.png';
+      return Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(width: 0.2, color: Colors.grey)),
+        ),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(right: 8),
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 3),
+                    child: Image(
+                      height: 16,
+                      width: 16,
+                      image: AssetImage(icon),
+                    ),
+                  ),
+                ),
+                Text(title ?? ""),
+              ],
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 10),
+              padding: EdgeInsets.only(left: 20),
+              child: Wrap(
+                children: _tabItem(items),
+              ),
+            )
           ],
         ),
-      ),
-    );
+      );
+    } else {
+      return Text("");
+    }
+  }
+
+  List<Widget> _tabItem(List<Items>? items) {
+    return items!.map((item) {
+      return GestureDetector(
+        onTap: () {},
+        child: Container(
+            alignment: Alignment.center,
+            margin: EdgeInsets.fromLTRB(0, 0, 6, 8),
+            padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
+            width: 0.3 * MediaQuery.of(context).size.width - 12,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Color(0xfff7f7f7),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center, // 垂直居中
+              children: [
+                Text(
+                  item.name ?? "",
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: TextStyle(fontSize: 12, fontFamily: ""),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            )),
+      );
+    }).toList();
+  }
+
+  _title(String name) {
+    if (name == null) {
+      return null;
+    }
+    List<TextSpan> spans = [];
+    spans.addAll(_keywordTextSpans(name, destinationSearchModel!.keyword!));
+    return RichText(text: TextSpan(children: spans));
+  }
+
+  _keywordTextSpans(String word, String keyword) {
+    List<TextSpan> spans = [];
+    if (word == null || word.length == 0) return spans;
+    String wordL = word.toLowerCase(), keywordL = keyword.toLowerCase();
+    List<String> arr = wordL.split(keywordL);
+    TextStyle normalStyle =
+        TextStyle(fontFamily: 'PingFang', color: Colors.black87);
+    TextStyle keywordStyle =
+        TextStyle(fontFamily: 'PingFang', color: Color(0xff0086f6));
+
+    int preIndex = 0;
+    for (int i = 0; i < arr.length; i++) {
+      if (i != 0) {
+        preIndex = wordL.indexOf(keywordL, preIndex);
+        spans.add(TextSpan(
+            text: word.substring(preIndex, preIndex + keyword.length),
+            style: keywordStyle));
+      }
+
+      String val = arr[i];
+      if (val != null && val.length > 0) {
+        spans.add(TextSpan(text: val, style: normalStyle));
+      }
+    }
+    return spans;
   }
 }

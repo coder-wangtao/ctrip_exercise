@@ -33,8 +33,6 @@ class DestinationSearchDao {
       var result = json.decode(utf8decoder.convert(response.bodyBytes));
       DestinationSearchModel model = DestinationSearchModel.fromJson(result);
       model.keyword = keyword;
-      print('==============================');
-      print(model.toJson());
       return model;
     } else {
       throw Exception('Failed to load travel');
