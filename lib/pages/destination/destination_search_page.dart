@@ -150,6 +150,7 @@ class _DestinationSearchPageState extends State<DestinationSearchPage> {
                   ),
                   Expanded(
                       child: Container(
+                    //wrap 换行
                     child: Wrap(
                       children: [
                         _title(item?.displayName ?? ""),
