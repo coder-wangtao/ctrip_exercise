@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 const CATCH_URLS = [
   'm.ctrip.com/',
@@ -13,17 +14,98 @@ class WebView extends StatefulWidget {
   final bool? hideAppBar;
   final String? title;
   final bool hideHead;
+  final String? statusBarColor;
+  final String? url;
+  final bool? backForbid;
   const WebView(
-      {super.key, this.hideAppBar, this.title, this.hideHead = false});
+      {super.key,
+      this.hideAppBar,
+      this.title,
+      this.statusBarColor,
+      this.url,
+      this.hideHead = false,
+      this.backForbid = false});
 
   @override
   State<WebView> createState() => _WebViewState();
 }
 
 class _WebViewState extends State<WebView> {
+  String? url;
+  late WebViewController controller;
+  var loadingPercentage = 0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    url = widget.url;
+    if (url != null && url!.contains('ctrip.com')) {
+      url = url!.replaceAll("http://", "https://");
+    }
+    _initWebViewController();
+  }
+
+  void _initWebViewController() {
+    controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(Color(0x00000000))
+      ..setNavigationDelegate(NavigationDelegate(
+        onProgress: (int progress) {
+          setState(() {
+            loadingPercentage = progress;
+          });
+        },
+        onPageStarted: (String url) {
+          setState(() {
+            loadingPercentage = 0;
+          });
+        },
+        onPageFinished: (String url) {
+          // //页面加载完成之后执行js
+          // _handleBackForbid();
+          setState(() {
+            loadingPercentage = 100;
+          });
+        },
+        onWebResourceError: (WebResourceError error) {},
+      ))
+      ..loadRequest(Uri.parse(url!));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    String statusBarColorStr = widget.statusBarColor ?? "ffffff";
+    Color backButtonColor;
+    if (statusBarColorStr == "fffffff") {
+      backButtonColor = Colors.black;
+    } else {
+      backButtonColor = Colors.white;
+    }
+    return Scaffold(
+      body: MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: Column(
+            children: [
+              _appBar(Color(int.parse('0xff' + statusBarColorStr)),
+                  backButtonColor),
+              Expanded(
+                child: Stack(
+                  children: [
+                    WebViewWidget(
+                      controller: controller,
+                    ),
+                    loadingPercentage < 100
+                        ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : Container()
+                  ],
+                ),
+              )
+            ],
+          )),
+    );
   }
 
   _appBar(Color backgroundColor, Color backButtonColor) {

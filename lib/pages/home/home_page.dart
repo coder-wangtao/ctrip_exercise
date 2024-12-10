@@ -5,11 +5,15 @@ import 'package:ctrip_exercise/pages/home/widget/grid_nav_widget.dart';
 import 'package:ctrip_exercise/pages/home/widget/sales_box_widget.dart';
 import 'package:ctrip_exercise/pages/home/widget/sub_nav_widget.dart';
 import 'package:ctrip_exercise/request/home/home_request.dart';
+import 'package:ctrip_exercise/util/navigator_util.dart';
 import 'package:ctrip_exercise/widget/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../widget/loading_container.dart';
+import '../../widget/webview.dart';
+import '../destination/destination_search_page.dart';
+import '../speak/speak_page.dart';
 
 const SEARCH_BAR_DEFAULT_TEXT = '目的地 | 酒店 | 景点 | 航班号';
 const APPBAR_SCROLL_OFFSET = 100;
@@ -66,11 +70,11 @@ class _HomePageState extends State<HomePage> {
               searchBarType: appBarAlpha > 0.2
                   ? SearchBarType.homeLight
                   : SearchBarType.home,
-              inputBoxClick: () {},
+              inputBoxClick: _jumpToSearch,
               defaultText: SEARCH_BAR_DEFAULT_TEXT,
               leftButtonClick: () {},
-              speakClick: () {},
-              rightButtonClick: () {},
+              speakClick: _jumpToSpeak,
+              rightButtonClick: _jumpToUser,
             ),
           ),
         ),
@@ -172,5 +176,33 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       appBarAlpha = alpha;
     });
+  }
+
+  void _jumpToSearch() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DestinationSearchPage(
+          hint: SEARCH_BAR_DEFAULT_TEXT,
+          hideLeft: false,
+        ),
+      ),
+    );
+  }
+
+  void _jumpToUser() {
+    NavigatorUtil.push(
+        context,
+        WebView(
+          url:
+              'https://m.ctrip.com/webapp/servicechatv2/messagelist/?from=%2Fwebapp%2Fmyctrip%2Findex',
+          hideHead: false,
+          hideAppBar: false,
+          title: '我的消息',
+        ));
+  }
+
+  void _jumpToSpeak() {
+    NavigatorUtil.push(context, SpeakPage());
   }
 }
